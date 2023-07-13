@@ -1,0 +1,92 @@
+groups:
+  - name: PrometheusTargets
+    rules:
+      # Правило, которое будет срабатывать при недоступности узла (node-exporter)
+      - alert: InstanceDown 
+        expr: up == 0 
+        for: 1m
+        labels:
+          severity: hight
+        annotations:
+          summary: Prometheus target missing (instance {{ $labels.instance }})
+          description: "A Prometheus target has disappeared. An exporter might be crashed. VALUE = {{ $value }}  LABELS: {{ $labels }}"
+      
+      # Правило, которое будет срабатывать при перезагрузке узла (node-exporter)
+      - alert: InstanceRestart
+        expr: node_boot_time_seconds == 0
+        for: 1m
+        labels:
+          severity: hight
+        annotations:
+          summary: PrometheusTargetRestart Instance restart (instance {{ $labels.instance }})
+          description: "ServerReboot took more than 1m to complete. VALUE = {{ $value }} LABELS = {{ $labels }}"
+
+      # BlackboxSlowProbe — предупреждать, если сайт открывается дольше 5 секунд
+      - alert: BlackboxSlowProbe
+        expr: avg_over_time(probe_duration_seconds[1m]) > 5
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: Blackbox slow probe (instance {{ $labels.instance }})
+          description: "Blackbox probe took more than 1s to complete\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          
+      # BlackboxProbeHttpFailure — реагировать, в случае получения кода ответа с ошибкой работы сайта (более 400).
+      - alert: BlackboxProbeHttpFailure
+        expr: probe_http_status_code <= 199 or probe_http_status_code >= 400
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Blackbox probe HTTP failure (instance {{ $labels.instance }})
+          description: "HTTP status code is not 200-300\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+          
+      # Правило предупреждающее об скором истечении времени сертификата
+      - alert: SslCertificateWillExpireSoon
+        expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 30
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SSL certificate will expire soon (instance {{ $labels.instance }})"
+          description: "SSL certificate expires in 30 days\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+      # Правило предупреждающее об истечении времени действия сертификата
+      - alert: SslCertificateHasExpired
+        expr: probe_ssl_earliest_cert_expiry - time()  <= 0
+        for: 5m
+        labels:
+          severity: error
+        annotations:
+          summary: "SSL certificate has expired (instance {{ $labels.instance }})"
+          description: "SSL certificate has expired already\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+ 
+      # Правило предупреждающее о медленных HTTP-запросах
+      - alert: HttpSlowRequests
+        expr: avg_over_time(probe_http_duration_seconds[1m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "HTTP slow requests (instance {{ $labels.instance }})"
+          description: "HTTP request took more than 1s\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+          
+      # Правило предупреждающее о медленных ICMP запросах
+      - alert: SlowPing
+        expr: avg_over_time(probe_icmp_duration_seconds[1m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow ping (instance {{ $labels.instance }})"
+          description: "Blackbox ping took more than 1s\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+        
+      # Правило предупреждающее об использования диска > 90 %
+      - alert: DiskSpaceUsage
+        expr: 100.0 - 100 * (wmi_logical_disk_free_bytes / wmi_logical_disk_size_bytes) > 90
+        for: 10m
+        labels:
+          severity: high
+        annotations:
+          summary: "Disk Space Usage (instance {{ $labels.instance }})"
+          description: "Disk Space on Drive is used more than 90%\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"

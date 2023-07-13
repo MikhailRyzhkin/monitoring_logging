@@ -1,0 +1,24 @@
+# Отправлка оповещений с помощью webhook на сервис alertmanager-bot:8080 (наш телеграм бот для alertmanager).
+route:
+  receiver: 'alertmanager-bot'
+  repeat_interval: 4h
+  group_by: [ alertname ]
+
+#Send to telegram
+receivers:
+- name: 'alertmanager-bot'
+  webhook_configs:
+  - send_resolved: true
+    url: 'http://alerttelegrambot:8080'
+
+#send to email
+#receivers:
+#  - name: 'mail'
+#    email_configs:
+#      - smarthost: 'smtp.mail.ru:465'
+#        require_tls: false
+#        auth_username: 'usermail@mail.ru'
+#        auth_password: "email_password"
+#        from: 'usermail@mail.ru'
+#        to: 'usermail1@mail.ru'
+    

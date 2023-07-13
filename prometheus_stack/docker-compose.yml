@@ -1,0 +1,76 @@
+version: '3.2'
+services:
+    prometheus:
+        image: prom/prometheus:latest
+        volumes:
+            - ./prometheus:/etc/prometheus/
+        command:
+            - --config.file=/etc/prometheus/prometheus.yml
+        ports:
+            - 0.0.0.0:9090:9090
+        restart: always
+
+    node-exporter:
+        image: prom/node-exporter
+        volumes:
+            - /proc:/host/proc:ro
+            - /sys:/host/sys:ro
+            - /:/rootfs:ro
+        hostname: monitoring
+        command:
+            - --path.procfs=/host/proc
+            - --path.sysfs=/host/sys
+            - --collector.filesystem.ignored-mount-points
+            - ^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)
+        ports:
+            - 0.0.0.0:9100:9100
+        restart: always
+
+    blackbox-exporter:
+        image: prom/blackbox-exporter
+        volumes:
+            - ./blackbox:/config
+        command: --config.file=/config/blackbox.yml
+        ports:
+            - 127.0.0.1:9115:9115
+        restart: always
+
+    grafana:
+        image: grafana/grafana
+        depends_on:
+            - prometheus
+        ports:
+            - 0.0.0.0:3000:3000
+        user: "0"
+        volumes:
+            - ./grafana:/var/lib/grafana
+            - ./grafana/provisioning/:/etc/grafana/provisioning/
+        restart: always
+            
+    alertmanager:
+        image: prom/alertmanager:v0.23.0
+        restart: unless-stopped
+        ports:
+            - "9093:9093"
+        volumes:
+            - ./alertmanager:/config
+        command: --config.file=/config/alertmanager.yml --log.level=debug
+
+    alertmanager-bot:
+        image: metalmatze/alertmanager-bot:0.4.3
+        container_name: alerttelegrambot
+        hostname: myalertbot
+        command:
+          - --alertmanager.url=http://alertmanager:9093
+          - --log.level=info
+          - --store=bolt
+          - --bolt.path=/data/bot.db
+          - --listen.addr=0.0.0.0:8080
+        env_file:
+          ../../data/tele.var
+        expose:
+        - 8080
+        restart: always
+        volumes:
+          - ./bot_data:/data
+
