@@ -37,9 +37,11 @@
   - Для сборки логов используем стэк Fluentd/Clickhouse/Loghouse, устанавленный с помощью helm chart.
   - Fluentd (https://www.fluentd.org/) - это инструмент для сбора и обогащения логов из различных источников,
   а также для маршрутизации их в различные приемники.
+![Fluentd](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/9c10e9a3-667f-431e-b272-cade49eb000d)
 
   - Loghouse (https://github.com/flant/loghouse) - это инструмент просмотра логов в кластере. В качестве сборщика логов используется Fluentd, а качестве хранилища данных – Clickhouse (https://clickhouse.tech/).
-  
+  ![loghouse](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/4e20d740-6367-402f-895d-f53728942ec1)
+
   - Устанавливаем репозиторий Loghouse и перечитываем его для обновления:
   ```
   helm repo add loghouse https://flant.github.io/loghouse/charts/  && helm repo update
@@ -48,6 +50,8 @@
   ```
   helm search repo loghouse
   ```
+![Установка loghous-0](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/0b181574-6815-4c32-b1ea-9f747d1f60bd)
+
   - В файле “loghouse-values.yml” мы задаем PVC для хранения данных. Установим Loghouse (Fluentd и Clickhouse устанавливаются вместе с ним) в нэймспейс loghouse:
   ```
   helm install --namespace loghouse --create-namespace -f monitoring_logging/loghouse-values.yml loghouse loghouse/loghouse
