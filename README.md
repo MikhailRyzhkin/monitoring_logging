@@ -53,14 +53,20 @@
   ```
   ![Установка loghous-0](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/0b181574-6815-4c32-b1ea-9f747d1f60bd)
 
-  - В файле “loghouse-values.yml” мы задаем PVC для хранения данных. Установим Loghouse (Fluentd и Clickhouse устанавливаются вместе с ним) в нэймспейс loghouse:
+  - В файле “loghouse-values.yml” мы задаем PVC для хранения логов. Клонируем репозиторий и переходим в него.
+  - Установим Loghouse (Fluentd и Clickhouse устанавливаются вместе с ним) в нэймспейс loghouse:
   ```
-  helm install --namespace loghouse --create-namespace -f monitoring_logging/loghouse-values.yml loghouse loghouse/loghouse
+  helm install --namespace loghouse --create-namespace -f loghouse/loghouse-values.yml loghouse loghouse/loghouse
   ```  
   - Проверяем как установился наш стэк логирования в кластере k8s:
   ```
   kubectl get pods -n loghouse
+  kubectl get service -n loghouse
+  kubectl get po -A
   ```
+
+  ![loghouse-1](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/5db00c18-8f18-4e4a-88a4-8bc788689d5e)
+
   Loghouse web UI будет доступен по ссылке: http://loghouse.local (пользователь: admin, пароль: PASSWORD).
   - Настраиваем дэшборд и для примера попробуем поискать логи нашего тестового приложения с помощью запроса: ~app="app" на diplom
 
