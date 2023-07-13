@@ -60,9 +60,7 @@
   ```  
   - Проверяем как установился наш стэк логирования в кластере k8s:
   ```
-  kubectl get pods -n loghouse
-  kubectl get service -n loghouse
-  kubectl get po -A
+  kubectl get pods -n loghouse && kubectl get service -n loghouse && kubectl get po -A
   ```
 
   ![loghouse-1](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/5db00c18-8f18-4e4a-88a4-8bc788689d5e)
