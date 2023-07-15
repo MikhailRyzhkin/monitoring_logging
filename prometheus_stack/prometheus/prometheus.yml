@@ -1,11 +1,12 @@
 # Указываем, что наш сервер мониторинга должен использовать в качестве системы оповещения alertmanager, 
-# который доступен по адресу alertmanager:9093. Также мы добавляем ссылку на отдельный файл alert.rules с описанием правил оповещения.
+# который доступен по адресу alertmanager:9093. Также мы добавляем ссылку на отдельный файл alert.rules 
+# с описанием правил оповещения.
 rule_files:
   - alert.yml
 
 # HTTP-запрос GET /metrics к нашим приложениям node-exporter, blackbox для получения метрик
 scrape_configs:
-  - job_name: node
+  - job_name: node_prometheus
     scrape_interval: 5s
     static_configs:
     - targets: ['node-exporter:9100']
@@ -23,13 +24,13 @@ scrape_configs:
     - source_labels: [__param_target]
       target_label: instance
     - target_label: __address__
-      replacement: blackbox-exporter:9115
+      replacement: blackbox:9115
 
 alerting:
   alertmanagers:
     - scheme: http
       static_configs:
-        - targets: [ 'alertmanager:9093' ]
+        - targets: ['alertmanager:9093']
 
 #alerting:
 #  alertmanagers:

@@ -33,57 +33,46 @@
 
 РЕШЕНИЕ
 
-Подзадача 1: Настройка сборки логов.
-  - Для сборки логов используем стэк Fluentd/Clickhouse/Loghouse, устанавленный с помощью helm chart.
-  - Fluentd (https://www.fluentd.org/) - это инструмент для сбора и обогащения логов из различных источников, а также для маршрутизации их в различные приемники.
-
-  ![Fluentd](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/9c10e9a3-667f-431e-b272-cade49eb000d)
-
-  - Loghouse (https://github.com/flant/loghouse) - это инструмент просмотра логов в кластере. В качестве сборщика логов используется Fluentd, а качестве хранилища данных – Clickhouse (https://clickhouse.tech/).
-
-  ![loghouse](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/4e20d740-6367-402f-895d-f53728942ec1)
-
-  - Устанавливаем репозиторий Loghouse и перечитываем его для обновления:
+  - Для сборки логов будем использовать Loki: https://artifacthub.io/packages/helm/grafana/loki?modal=install
+  - Добавляем репозиторий Loki и перечитываем репозитории:
   ```
-  helm repo add loghouse https://flant.github.io/loghouse/charts/  && helm repo update
+  helm repo add grafana https://grafana.github.io/helm-charts && helm repo update
   ```
-  - Смотрим список доступных чартов:
+  Устанавливаем Loki в кластер k8s из helm chart:
   ```
-  helm search repo loghouse
+  helm install --namespace loging --create-namespace loki grafana/loki --version 5.8.9
   ```
-  ![Установка loghous-0](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/0b181574-6815-4c32-b1ea-9f747d1f60bd)
-
-  - В файле “loghouse-values.yml” мы задаем PVC для хранения логов. Клонируем репозиторий и переходим в него.
-  - Установим Loghouse (Fluentd и Clickhouse устанавливаются вместе с ним) в нэймспейс loghouse:
+  
+  - Для мониторинга кластера и приложения будем использовать Prometheus stack: https://artifacthub.io/packages/helm/prometheus-community/prometheus?modal=install
+  - Добавляем репозиторий Prometheus stack и перечитываем репозитории:
   ```
-  helm install --namespace loghouse --create-namespace -f loghouse/loghouse-values.yml loghouse loghouse/loghouse
-  ```  
-  - Проверяем как установился наш стэк логирования в кластере k8s:
+  helm repo add prometheus-community https://prometheus-community.github.io/helm-charts && helm repo update
   ```
-  kubectl get pods -n loghouse && kubectl get service -n loghouse && kubectl get po -A
+  - Устанавливаем Prometheus stack в кластер k8s из helm chart:
+  ```
+  helm install --namespace monitoring --create-namespace prometheus prometheus-community/prometheus --version 23.1.0
+  ```
+   
+  - Проверяем как установился наш стэк логирования и мониторинга в кластере k8s:
+  ```
+  kubectl get service -n loging && kubectl get service -n monitoring && kubectl get po -A
   ```
 
-  ![loghouse-1](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/5db00c18-8f18-4e4a-88a4-8bc788689d5e)
+  - И смотрим как работают сервисы:
 
-  Loghouse web UI будет доступен по ссылке: http://loghouse.local (пользователь: admin, пароль: PASSWORD).
-  - Настраиваем дэшборд и для примера попробуем поискать логи нашего тестового приложения с помощью запроса: ~app="app" на diplom
-
-
-  Подзадача 2: Выбор метрик для мониторинга.
-  - Так как по условию задачи весь мониторинг должен находиться на srv-сервере, а не в кластере k8s, то наиболее простой вариант развернуть кластер мониторинга в docker на этом сервере. 
+  - Так как по условию задачи весь мониторинг должен находиться на srv-сервере, а не в кластере k8s, то наиболее простой вариант развернуть кластер мониторинга в docker на этом сервере вне кластера k8s. 
   Стэк мониторинга - Grafana\Prometheus\Blackbox\Node Exporter\Alertmanager
   - В каталоге prometheus_stack описываем через docker compose весь наш стэк мониторинга
   - Находясь в каталоге prometheus_stack с файлом docker-compose.yml запускаем развёртывание стэка:
   ```
-  docker-compose up -d 
+  docker compose up -d 
   ```
   - При удачном развёртывании стэка увидем контейнеры компонентов:
+  ```
+  docker ps -a 
+  ```
 
-  - Для мониторинга кластера k8s пишем манифесты, расположенные в подкаталоге k8s-monitoring
-  - Переходим в этот подкатолог k8s-monitoring и запускаем развёртывание на нодах кластера по этим манифестам:
-  ```
-  kubectl create namespace monitoring && kubectl apply -f . -n monitoring && kubectl get pods -n monitoring && kubectl get pods -A
-  ```
+  - И сами сервисы:
+  
   - Подключаем как сервер srv, так и кластер k8s к визуализации метрик Grafana:
 
-  Подзадача 3: Настройка дашборда.

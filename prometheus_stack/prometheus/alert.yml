@@ -60,16 +60,6 @@ groups:
         annotations:
           summary: "SSL certificate has expired (instance {{ $labels.instance }})"
           description: "SSL certificate has expired already\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
- 
-      # Правило предупреждающее о медленных HTTP-запросах
-      - alert: HttpSlowRequests
-        expr: avg_over_time(probe_http_duration_seconds[1m]) > 5
-        for: 5m
-        labels:
-          severity: warning
-        annotations:
-          summary: "HTTP slow requests (instance {{ $labels.instance }})"
-          description: "HTTP request took more than 1s\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
           
       # Правило предупреждающее о медленных ICMP запросах
       - alert: SlowPing
