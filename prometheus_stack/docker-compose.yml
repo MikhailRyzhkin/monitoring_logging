@@ -151,19 +151,19 @@ services:
   promtail:
     image: grafana/promtail:2.8.0
     container_name: promtail
-    hostname: promtail
     volumes:
       - /var/log:/var/log
       - ./promtail/:/etc/promtail/
-    command: -config.file=/etc/promtail/config.yml
+    command: 
+      - --config.file=/etc/promtail/config.yml
 #    deploy:
 #      placement:
 #        constraints:
 #          - node.role==manager
-      restart_policy:
-        condition: on-failure
-    environment:
-      TZ: "Europe/Moscow"
+#      restart_policy:
+#        condition: on-failure
+#    environment:
+#      TZ: "Europe/Moscow"
     networks:
       - default
 
