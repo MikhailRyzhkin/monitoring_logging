@@ -1,5 +1,4 @@
 version: '3'
-
 services:
 # Разворачиваем контейнер Prometheus - БД временных рядов и интерфейс для выполнения PromQL запросов (порт 9090)
   prometheus:
@@ -201,7 +200,7 @@ services:
     environment:
       TZ: "Europe/Moscow"
     env_file:
-      ./data/Telegram.var
+      - ./data/Telegram.var
     restart: unless-stopped
     volumes:
       - ./data:/data
