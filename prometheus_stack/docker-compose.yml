@@ -1,6 +1,5 @@
 version: '3'
 
-
 services:
 # Разворачиваем контейнер Prometheus - БД временных рядов и интерфейс для выполнения PromQL запросов (порт 9090)
   prometheus:
@@ -20,8 +19,6 @@ services:
       - default
     depends_on:
     - cadvisor
-
-
 
 # Разворачиваем контейнер cadvisor - для мониторинга контейнеров (порт 8081)
   cadvisor:
@@ -210,7 +207,6 @@ services:
       - ./data:/data
     networks:
       - default
-
 
 networks:
   default:
