@@ -1,0 +1,157 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    meta.helm.sh/release-name: loghouse
+    meta.helm.sh/release-namespace: logging-monitoring
+
+  generation: 1
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  name: loghouse
+  namespace: logging-monitoring
+
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      component: loghouse
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        component: loghouse
+    spec:
+      containers:
+      - command:
+        - /usr/sbin/nginx
+        env:        
+        - name: KUBERNETES_DEPLOYED
+        image: nginx:alpine
+        imagePullPolicy: IfNotPresent
+        name: frontend
+        ports:
+        - containerPort: 8082
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 64Mi
+          requests:
+            cpu: 100m
+            memory: 64Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /nginx/passwd
+          name: basic-auth
+          readOnly: true
+        - mountPath: /etc/nginx/nginx.conf
+          name: nginx-conf
+          subPath: nginx.conf
+      - command:
+        - bundle
+        - exec
+        - puma
+        env:
+        - name: DO_DB_DEPLOY
+          value: "true"
+        - name: CLICKHOUSE_URL
+          value: clickhouse:8123
+        - name: CLICKHOUSE_SERVER
+          value: clickhouse
+        - name: CLICKHOUSE_PORT
+          value: "9000"
+        - name: CLICKHOUSE_HTTP_PORT
+          value: "8123"
+        - name: CLICKHOUSE_DATABASE
+          value: logs
+        - name: CLICKHOUSE_LOGS_TABLE
+          value: logs
+        - name: LOGS_TABLES_RETENTION_PERIOD
+          value: "7"
+        - name: LOGS_TABLES_HAS_BUFFER
+          value: "false"
+        - name: PERMISSONS_FILE_PATH
+          value: /config/user.conf
+        - name: RACK_ENV
+          value: production
+        envFrom:
+        - secretRef:
+            name: clickhouse-credentilas
+        image: flant/loghouse-dashboard:0.3.1
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: 9292
+          timeoutSeconds: 1
+        name: backend
+        ports:
+        - containerPort: 9292
+          name: http2
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: 9292
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: 100m
+            memory: 32Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /config
+          name: user-config
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - command:
+        - /bin/sh
+        - -c
+        - while ! nc -z clickhouse 8123; do sleep 1; done
+        image: alpine:3.6
+        imagePullPolicy: IfNotPresent
+        name: wait-clickhouse
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: loghouse
+      serviceAccountName: loghouse
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: loghouse-user-config
+        name: user-config
+      - name: basic-auth
+        secret:
+          defaultMode: 420
+          secretName: basic-auth
+      - configMap:
+          defaultMode: 420
+          name: loghouse-nginx-conf
+        name: nginx-conf
+status:
+  availableReplicas: 1
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

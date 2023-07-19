@@ -178,7 +178,6 @@ services:
     restart: unless-stopped
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml --log.level=debug"
-      - --storage.path=/etc/alertmanager/data
     networks:
       - default
 
@@ -193,8 +192,8 @@ services:
       - --store=bolt
       - --bolt.path=/data/bot.db
       - --listen.addr=0.0.0.0:8080
-      - --telegram.admin=TELEGRAM.ADMIN
-      - --telegram.token=TELEGRAM.TOKEN
+#      - --telegram.admin=TELEGRAM.ADMIN
+#      - --telegram.token=TELEGRAM.TOKEN
 #    ports:
 #      - "8080:8080"
     expose:

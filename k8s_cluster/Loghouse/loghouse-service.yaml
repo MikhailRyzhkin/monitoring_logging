@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    meta.helm.sh/release-name: loghouse
+    meta.helm.sh/release-namespace: logging-monitoring
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  name: loghouse
+  namespace: logging-monitoring
+
+spec:
+  clusterIP: 10.233.22.173
+  clusterIPs:
+  - 10.233.22.173
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - port: 8082
+      targetPort: 8082
+      nodePort: 30082
+      protocol: TCP
+  selector:
+    component: loghouse
+  externalIPs:
+    - 158.160.75.53
+    - 158.160.18.130
+  sessionAffinity: None
+  type: NodePort

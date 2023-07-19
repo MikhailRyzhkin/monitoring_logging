@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    meta.helm.sh/release-name: elk-prometheus
+    meta.helm.sh/release-namespace: logging-monitoring
+  labels:
+    app: prometheus-elasticsearch-exporter
+    app.kubernetes.io/managed-by: Helm
+    chart: prometheus-elasticsearch-exporter-5.2.0
+    heritage: Helm
+    release: elk-prometheus
+  name: elk-prometheus-prometheus-elasticsearch-exporter
+  namespace: logging-monitoring
+
+spec:
+  type: NodePort
+  ports:
+    - port: 9108
+      targetPort: 9108
+      nodePort: 39108
+      protocol: TCP
+  selector:
+    app: prometheus-elasticsearch-exporter
+    release: elk-prometheus
+  externalIPs:
+    - 158.160.75.53
+    - 158.160.18.130
