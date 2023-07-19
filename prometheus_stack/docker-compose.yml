@@ -172,12 +172,11 @@ services:
     ports:
       - "9093:9093"
     volumes:
-      - ./alertmanager:/etc/alertmanager/
+      - ./alertmanager:/config
     environment:
       TZ: "Europe/Moscow"
     restart: unless-stopped
-    command:
-      - "--config.file=/etc/alertmanager/alertmanager.yml --log.level=debug"
+    command: --config.file=/config/alertmanager.yaml --log.level=debug
     networks:
       - default
 
@@ -192,16 +191,16 @@ services:
       - --store=bolt
       - --bolt.path=/data/bot.db
       - --listen.addr=0.0.0.0:8080
-#      - --telegram.admin=TELEGRAM.ADMIN
-#      - --telegram.token=TELEGRAM.TOKEN
+      - --telegram.admin=TELEGRAM.ADMIN
+      - --telegram.token=TELEGRAM.TOKEN
 #    ports:
 #      - "8080:8080"
     expose:
       - 8080
     environment:
       TZ: "Europe/Moscow"
-    env_file:
-      - ./data/Telegram.var
+#    env_file:
+#      - ./data/Telegram.var
     restart: unless-stopped
     volumes:
       - ./data:/data
