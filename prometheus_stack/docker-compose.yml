@@ -91,11 +91,12 @@ services:
     image: grafana/grafana:latest
     container_name: grafana
     hostname: grafana
-#    user: "0"
+    user: "0"
     ports:
       - "3000:3000"
     volumes:
       - ./grafana:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
     restart: unless-stopped
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
