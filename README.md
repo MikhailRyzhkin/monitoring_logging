@@ -76,18 +76,25 @@
 
 ![Dashboards](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/6248ac33-d0d1-4a7a-9d11-c10ed2d004e8)
 
-![Dashboards-1](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/07738b2f-e7f0-4e36-b233-1e578ad9da76)
+![Dashboards-1](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/1db8864c-3061-4826-8979-70429058c9d5)
 
-![Dashboards-2](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/53498f5a-9aaf-4a5d-a8f6-4fac56db5eb9)
+![Dashboards-2](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/f62856f5-50a3-4f87-9919-60c1e876cc41)
+
 
   - Смотрим логи нашего приложения в нэймспейсе diplom из этой же самой grafana:
 
-![logging-loki](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/67689a5c-e597-4d3a-be69-3f22d5de3f8e)
+![logging-loki](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/e3299c1d-7882-4b9c-8cbf-8d425a2f2d04)
+
 
   - Адрес grafana для просмотра логов и визуализированных метрик:
   ```
   http://51.250.80.225:3000/
   ```
+  - В docker-compouse.yaml файле на сервере srv вносим свои данные телеграмм, перезапускаем контейнер и моделируем срабатывание аллерта
+
+![токены телеги](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/f58fe588-6c37-45ce-a74a-d0a9467b598f)
+
+![токены телеги](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/82bf375e-0bbe-4c02-b612-49850ff62a89)
 
 
 
