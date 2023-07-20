@@ -94,7 +94,8 @@
 
 ![токены телеги](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/f58fe588-6c37-45ce-a74a-d0a9467b598f)
 
-![токены телеги](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/82bf375e-0bbe-4c02-b612-49850ff62a89)
+![telegramm-allert](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/72218f65-d511-46b0-955d-77eb18783f1a)
+
 
 
 
