@@ -96,6 +96,7 @@
 
 ![telegramm-allert](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/72218f65-d511-46b0-955d-77eb18783f1a)
 
+![Оповещение в телеграм](https://github.com/MikhailRyzhkin/monitoring_logging/assets/69116076/0334c554-4c17-45bd-be18-70a89af13a7d)
 
 
 
